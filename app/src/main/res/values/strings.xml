@@ -13,4 +13,6 @@
     <string name="evans">Chris Evans</string>
     <string name="ruffalo">Mark Ruffalo</string>
     <string name="chris_hemsworth">Chris Hemsworth</string>
+    <string name="movies_list">Movies list</string>
+    <string name="movies_list_film_time">137 MIN</string>
 </resources>
