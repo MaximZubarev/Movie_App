@@ -24,7 +24,7 @@
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@drawable/moview_desc_bg_gradient"
+            android:background="@drawable/movie_list_mask"
             app:layout_constraintBottom_toBottomOf="@+id/imageView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/imageView"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="-56dp"
-            android:text="@string/thirteen_age"
+            tools:text="13+"
             android:textColor="@color/white"
             android:textSize="12sp"
             android:textStyle="bold"
@@ -128,7 +128,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="9dp"
             android:layout_marginTop="4dp"
-            android:text="@string/reviews"
+            tools:text="@string/reviews"
             android:textColor="@color/storm_gray"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -176,93 +176,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/description" />
 
-        <ImageView
-            android:id="@+id/img_downey"
-            android:layout_width="wrap_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_actor_list"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cast"
-            app:srcCompat="@drawable/movie" />
-
-        <ImageView
-            android:id="@+id/img_evans"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            app:layout_constraintStart_toEndOf="@+id/img_downey"
-            app:layout_constraintTop_toTopOf="@+id/img_downey"
-            app:srcCompat="@drawable/movie_2" />
-
-        <ImageView
-            android:id="@+id/img_ruffalo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            app:layout_constraintStart_toEndOf="@+id/img_evans"
-            app:layout_constraintTop_toTopOf="@+id/img_downey"
-            app:srcCompat="@drawable/movie_3" />
-
-        <ImageView
-            android:id="@+id/img_hems"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            app:layout_constraintStart_toEndOf="@+id/img_ruffalo"
-            app:layout_constraintTop_toTopOf="@+id/img_downey"
-            app:srcCompat="@drawable/movie_4" />
-
-        <TextView
-            android:id="@+id/text_downey"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="@string/downey"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            android:fontFamily="sans-serif-medium"
-            app:layout_constraintEnd_toEndOf="@+id/img_downey"
-            app:layout_constraintStart_toStartOf="@+id/img_downey"
-            app:layout_constraintTop_toBottomOf="@+id/img_downey" />
-
-        <TextView
-            android:id="@+id/text_evans"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="@string/evans"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            android:fontFamily="sans-serif-medium"
-            app:layout_constraintEnd_toEndOf="@+id/img_evans"
-            app:layout_constraintStart_toStartOf="@+id/img_evans"
-            app:layout_constraintTop_toBottomOf="@+id/img_evans" />
-
-        <TextView
-            android:id="@+id/text_ruffalo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="@string/ruffalo"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            android:fontFamily="sans-serif-medium"
-            app:layout_constraintEnd_toEndOf="@+id/img_ruffalo"
-            app:layout_constraintStart_toStartOf="@+id/img_ruffalo"
-            app:layout_constraintTop_toBottomOf="@+id/img_ruffalo" />
-
-        <TextView
-            android:id="@+id/text_hems"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="@string/chris_hemsworth"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            android:fontFamily="sans-serif-medium"
-            app:layout_constraintEnd_toEndOf="@+id/img_hems"
-            app:layout_constraintStart_toStartOf="@+id/img_hems"
-            app:layout_constraintTop_toBottomOf="@+id/img_hems" />
+            app:layout_constraintTop_toBottomOf="@+id/cast" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

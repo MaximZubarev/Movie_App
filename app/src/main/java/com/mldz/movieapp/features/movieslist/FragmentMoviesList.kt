@@ -1,4 +1,4 @@
-package com.mldz.movieapp
+package com.mldz.movieapp.features.movieslist
 
 import android.content.Context
 import android.os.Bundle
@@ -6,6 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.mldz.movieapp.R
+import com.mldz.movieapp.list.MovieListAdapter
+import com.mldz.movieapp.models.DataGenerator
+import com.mldz.movieapp.models.MovieData
 
 
 class FragmentMoviesList: Fragment() {
@@ -19,17 +25,19 @@ class FragmentMoviesList: Fragment() {
         return inflater.inflate(R.layout.fragment_movie_list, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val movieList = view.findViewById<RecyclerView>(R.id.rv_movie_list)
+        val adapter = MovieListAdapter{ item -> movieClickListener?.onItemClick(item) }
+        movieList.layoutManager = GridLayoutManager(context, 2)
+        movieList.adapter = adapter
+        adapter.submitList(DataGenerator.generateMovieList())
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is onMovieClick) {
             movieClickListener = context
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        view?.findViewById<ViewGroup>(R.id.movies_list_item_layout)?.setOnClickListener {
-            movieClickListener?.onItemClick()
         }
     }
 
@@ -49,6 +57,6 @@ class FragmentMoviesList: Fragment() {
     }
 
     interface onMovieClick {
-        fun onItemClick()
+        fun onItemClick(movie: MovieData)
     }
 }

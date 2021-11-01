@@ -2,10 +2,10 @@
     <string name="app_name">Movie App</string>
     <string name="title_activity_movie_details">MovieDetailsActivity</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="thirteen_age">13+</string>
-    <string name="avengers_end_game">Avengers: End Game</string>
+    <string name="age">%1$d+</string>
+
     <string name="genre">Action, Adventure, Fantasy</string>
-    <string name="reviews">125 Reviews</string>
+    <string name="reviews">%1$d Reviews</string>
     <string name="storyline">Storyline</string>
     <string name="description">After the devastating events of Avengers: Infinity War, the universe is in ruins. With the help of remaining allies, the Avengers assemble once more in order to reverse Thanos\' actions and restore balance to the universe.</string>
     <string name="cast">Cast</string>
@@ -14,5 +14,11 @@
     <string name="ruffalo">Mark Ruffalo</string>
     <string name="chris_hemsworth">Chris Hemsworth</string>
     <string name="movies_list">Movies list</string>
-    <string name="movies_list_film_time">137 MIN</string>
+    <string name="movies_list_film_time">%1$d MIN</string>
+
+<!--    films-->
+    <string name="avengers_end_game">Avengers: End Game</string>
+    <string name="tenet">Tenet</string>
+    <string name="black_widow">Black widow</string>
+    <string name="wonder_women">Wonder women</string>
 </resources>
