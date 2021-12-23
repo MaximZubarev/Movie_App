@@ -8,11 +8,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.mldz.movieapp.R
-import com.mldz.movieapp.models.ActorData
+import com.mldz.movieapp.models.Actor
 
 
-class ActorListAdapter: ListAdapter<ActorData, ActorListAdapter.ViewHolder>(DiffCallback()) {
+class ActorListAdapter: ListAdapter<Actor, ActorListAdapter.ViewHolder>(DiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.view_holder_actor, parent, false))
     }
@@ -25,18 +26,18 @@ class ActorListAdapter: ListAdapter<ActorData, ActorListAdapter.ViewHolder>(Diff
         private val avatar = itemView.findViewById<ImageView>(R.id.avatar)
         private val name = itemView.findViewById<TextView>(R.id.name)
 
-        fun bind(item: ActorData) {
-            avatar.setImageResource(item.imageRes)
+        fun bind(item: Actor) {
+            avatar.load(item.imageUrl)
             name.text = item.name
         }
     }
 
-    class DiffCallback: DiffUtil.ItemCallback<ActorData>() {
-        override fun areItemsTheSame(oldItem: ActorData, newItem: ActorData): Boolean {
+    class DiffCallback: DiffUtil.ItemCallback<Actor>() {
+        override fun areItemsTheSame(oldItem: Actor, newItem: Actor): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: ActorData, newItem: ActorData): Boolean {
+        override fun areContentsTheSame(oldItem: Actor, newItem: Actor): Boolean {
             return oldItem == newItem
         }
     }

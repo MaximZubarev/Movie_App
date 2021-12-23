@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.mldz.movieapp.features.moviesdetails.FragmentMovieDetails
 import com.mldz.movieapp.features.movieslist.FragmentMoviesList
-import com.mldz.movieapp.models.MovieData
+import com.mldz.movieapp.models.Movie
 
 class MainActivity : AppCompatActivity(), FragmentMoviesList.onMovieClick {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity(), FragmentMoviesList.onMovieClick {
                 }
     }
 
-    override fun onItemClick(movie: MovieData) {
-        replaceFragment(FragmentMovieDetails.newInstance(movie), true)
+    override fun onItemClick(movie: Movie) {
+        replaceFragment(FragmentMovieDetails.newInstance(movie.id), true)
     }
 }

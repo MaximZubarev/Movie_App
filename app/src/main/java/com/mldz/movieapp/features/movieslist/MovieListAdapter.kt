@@ -11,11 +11,13 @@ import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.mldz.movieapp.models.MovieData
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import com.mldz.movieapp.R
+import com.mldz.movieapp.models.Movie
 
 
-class MovieListAdapter(private val onClickCard: (item: MovieData) -> Unit): ListAdapter<MovieData, MovieListAdapter.MovieViewHolder>(DiffCallback()) {
+class MovieListAdapter(private val onClickCard: (item: Movie) -> Unit): ListAdapter<Movie, MovieListAdapter.MovieViewHolder>(DiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
         return MovieViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.view_holder_movie, parent, false))
     }
@@ -42,15 +44,19 @@ class MovieListAdapter(private val onClickCard: (item: MovieData) -> Unit): List
                 itemView.findViewById(R.id.movie_rating_star5_image)
         )
 
-        fun bind(movieData: MovieData, onClickCard: (item: MovieData) -> Unit) {
-            title.text = movieData.title
-            genre.text = movieData.genre
-            reviews.text = itemView.context.getString(R.string.reviews, movieData.reviewsCount)
-            duration.text = itemView.context.getString(R.string.movies_list_film_time, movieData.duration)
-            poster.setImageResource(movieData.poster)
-            age.text = movieData.age.toString()
+        fun bind(movie: Movie, onClickCard: (item: Movie) -> Unit) {
+            title.text = movie.title
+            genre.text = movie.genres.joinToString { it.name }
+            reviews.text = itemView.context.getString(R.string.reviews, movie.reviewCount)
+            duration.text = itemView.context.getString(R.string.movies_list_film_time, movie.runningTime)
+            age.text = movie.pgAge.toString()
 
-            if (movieData.isLiked) {
+            poster.load(movie.imageUrl) {
+                placeholder(R.drawable.movie_avengers)
+                transformations(RoundedCornersTransformation(15f, 15f, 0f,0f))
+            }
+
+            if (movie.isLiked) {
                 ImageViewCompat.setImageTintList(
                         like, ColorStateList.valueOf(
                         ContextCompat.getColor(like.context, R.color.radical_red)
@@ -59,7 +65,7 @@ class MovieListAdapter(private val onClickCard: (item: MovieData) -> Unit): List
             }
 
             starsImages.forEachIndexed { index, imageView ->
-                val colorId = if (movieData.rating > index) R.color.radical_red else R.color.storm_gray
+                val colorId = if (movie.rating > index) R.color.radical_red else R.color.storm_gray
                 ImageViewCompat.setImageTintList(
                         imageView, ColorStateList.valueOf(
                         ContextCompat.getColor(imageView.context, colorId)
@@ -68,17 +74,17 @@ class MovieListAdapter(private val onClickCard: (item: MovieData) -> Unit): List
             }
 
             container.setOnClickListener{
-                onClickCard(movieData)
+                onClickCard(movie)
             }
         }
     }
 
-    class DiffCallback: DiffUtil.ItemCallback<MovieData>() {
-        override fun areItemsTheSame(oldItem: MovieData, newItem: MovieData): Boolean {
+    class DiffCallback: DiffUtil.ItemCallback<Movie>() {
+        override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean {
             return oldItem.title == newItem.title
         }
 
-        override fun areContentsTheSame(oldItem: MovieData, newItem: MovieData): Boolean {
+        override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean {
             return oldItem == newItem
         }
 

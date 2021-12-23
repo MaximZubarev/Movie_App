@@ -2,19 +2,24 @@ package com.mldz.movieapp.features.moviesdetails
 
 import android.content.res.ColorStateList
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.widget.ImageViewCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.mldz.movieapp.R
-import com.mldz.movieapp.models.MovieData
+import com.mldz.movieapp.data.JsonMovieRepository
+import com.mldz.movieapp.models.Movie
+import kotlinx.coroutines.launch
 
 class FragmentMovieDetails : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,26 +33,40 @@ class FragmentMovieDetails : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val movieData = arguments?.getSerializable(PARAM_MOVIE_DATA) as? MovieData ?: return
-        updateMovieDetailsInfo(movieData)
+        val movieId = arguments?.getSerializable(PARAM_MOVIE_DATA) as? Int ?: return
 
         val adapter = ActorListAdapter()
         val actorsList = view.findViewById<RecyclerView>(R.id.rv_actor_list)
         actorsList.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
         actorsList.adapter = adapter
-        adapter.submitList(movieData.actors)
+
+        loadMovie(movieId, adapter)
     }
 
-    private fun updateMovieDetailsInfo(movieData: MovieData) {
+    private fun loadMovie(movieId: Int, adapter: ActorListAdapter) {
+        lifecycleScope.launch {
+            val repo = JsonMovieRepository(requireContext())
+            val movie = repo.loadMovie(movieId)
+
+            if (movie != null) {
+                updateMovieDetailsInfo(movie)
+                adapter.submitList(movie.actors)
+            } else {
+                showMovieNotFoundError()
+            }
+        }
+    }
+
+    private fun updateMovieDetailsInfo(movie: Movie) {
         view?.findViewById<ImageView>(R.id.imageView)
-                ?.setImageResource(movieData.poster)
+                ?.load(movie.imageUrl)
 
-        view?.findViewById<TextView>(R.id.age)?.text = context?.getString(R.string.age, movieData.age)
+        view?.findViewById<TextView>(R.id.age)?.text = context?.getString(R.string.age, movie.pgAge)
 
-        view?.findViewById<TextView>(R.id.movie_title)?.text = movieData.title
-        view?.findViewById<TextView>(R.id.genre)?.text = movieData.genre
-        view?.findViewById<TextView>(R.id.reviews)?.text = context?.getString(R.string.reviews, movieData.reviewsCount)
-        view?.findViewById<TextView>(R.id.description)?.text = movieData.description
+        view?.findViewById<TextView>(R.id.movie_title)?.text = movie.title
+        view?.findViewById<TextView>(R.id.genre)?.text = movie.genres.joinToString { it.name }
+        view?.findViewById<TextView>(R.id.reviews)?.text = context?.getString(R.string.reviews, movie.reviewCount)
+        view?.findViewById<TextView>(R.id.description)?.text = movie.storyLine
 
         val starsImages = listOf<ImageView?>(
                 view?.findViewById(R.id.star1),
@@ -59,7 +78,7 @@ class FragmentMovieDetails : Fragment() {
         starsImages.forEachIndexed { index, imageView ->
             imageView?.let {
                 val colorId =
-                        if (movieData.rating > index) R.color.radical_red else R.color.storm_gray
+                        if (movie.rating > index) R.color.radical_red else R.color.storm_gray
                 ImageViewCompat.setImageTintList(
                         imageView, ColorStateList.valueOf(
                         ContextCompat.getColor(imageView.context, colorId)
@@ -69,14 +88,19 @@ class FragmentMovieDetails : Fragment() {
         }
     }
 
+    private fun showMovieNotFoundError() {
+        Toast.makeText(requireContext(), R.string.error_movie_not_found, Toast.LENGTH_LONG)
+            .show()
+    }
+
     companion object {
         private const val PARAM_MOVIE_DATA = "movie_data"
 
         @JvmStatic
-        fun newInstance(movieData: MovieData) =
+        fun newInstance(movieId: Int) =
                 FragmentMovieDetails().apply {
                     arguments = bundleOf(
-                            PARAM_MOVIE_DATA to movieData
+                            PARAM_MOVIE_DATA to movieId
                     )
                 }
     }
