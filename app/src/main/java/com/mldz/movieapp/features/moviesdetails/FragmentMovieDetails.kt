@@ -12,16 +12,18 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.mldz.movieapp.R
 import com.mldz.movieapp.data.JsonMovieRepository
 import com.mldz.movieapp.models.Movie
-import kotlinx.coroutines.launch
 
 class FragmentMovieDetails : Fragment() {
+    private val viewModelFactory by lazy { MovieDetailsViewModel.Factory(JsonMovieRepository(requireActivity())) }
+    private val viewModel by lazy { ViewModelProvider(requireActivity(), viewModelFactory).get(MovieDetailsViewModel::class.java) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -44,17 +46,17 @@ class FragmentMovieDetails : Fragment() {
     }
 
     private fun loadMovie(movieId: Int, adapter: ActorListAdapter) {
-        lifecycleScope.launch {
-            val repo = JsonMovieRepository(requireContext())
-            val movie = repo.loadMovie(movieId)
-
-            if (movie != null) {
-                updateMovieDetailsInfo(movie)
-                adapter.submitList(movie.actors)
-            } else {
-                showMovieNotFoundError()
+        viewModel.loadMovie(movieId)
+        viewModel.movie.observe(viewLifecycleOwner, { movie ->
+            run {
+                if (movie != null) {
+                    updateMovieDetailsInfo(movie)
+                    adapter.submitList(movie.actors)
+                } else {
+                    showMovieNotFoundError()
+                }
             }
-        }
+        })
     }
 
     private fun updateMovieDetailsInfo(movie: Movie) {
