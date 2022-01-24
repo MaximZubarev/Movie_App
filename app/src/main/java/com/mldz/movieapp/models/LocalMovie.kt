@@ -2,7 +2,7 @@ package com.mldz.movieapp.models
 import java.io.Serializable
 
 
-data class Movie(
+data class LocalMovie(
         val id: Int,
         val pgAge: Int,
         val title: String,

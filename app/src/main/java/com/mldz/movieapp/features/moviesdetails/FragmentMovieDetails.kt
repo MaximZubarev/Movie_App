@@ -17,11 +17,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.mldz.movieapp.R
-import com.mldz.movieapp.data.JsonMovieRepository
-import com.mldz.movieapp.models.Movie
+import com.mldz.movieapp.data.model.Movie
+import com.mldz.movieapp.data.network.ApiClient
+import com.mldz.movieapp.data.network.RetrofitBuilder
+import com.mldz.movieapp.data.repository.RemoteMovieRepository
+import com.mldz.movieapp.utils.Constants
+import com.mldz.movieapp.utils.Status
+import kotlin.math.ceil
 
 class FragmentMovieDetails : Fragment() {
-    private val viewModelFactory by lazy { MovieDetailsViewModel.Factory(JsonMovieRepository(requireActivity())) }
+    private val viewModelFactory by lazy { MovieDetailsViewModel.Factory(
+        RemoteMovieRepository(
+            ApiClient(RetrofitBuilder.apiService)
+        )
+    ) }
     private val viewModel by lazy { ViewModelProvider(requireActivity(), viewModelFactory).get(MovieDetailsViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,13 +56,21 @@ class FragmentMovieDetails : Fragment() {
 
     private fun loadMovie(movieId: Int, adapter: ActorListAdapter) {
         viewModel.loadMovie(movieId)
-        viewModel.movie.observe(viewLifecycleOwner, { movie ->
+        viewModel.localMovie.observe(viewLifecycleOwner, {
             run {
-                if (movie != null) {
-                    updateMovieDetailsInfo(movie)
-                    adapter.submitList(movie.actors)
-                } else {
-                    showMovieNotFoundError()
+                it.let { resource ->
+                    when (resource.status) {
+                        Status.SUCCESS -> {
+                            updateMovieDetailsInfo(it.data!!)
+//                            adapter.submitList(movie.actors)
+                        }
+                        Status.ERROR -> {
+                            showMovieNotFoundError(it.message)
+                        }
+                        Status.LOADING -> {
+
+                        }
+                    }
                 }
             }
         })
@@ -61,14 +78,16 @@ class FragmentMovieDetails : Fragment() {
 
     private fun updateMovieDetailsInfo(movie: Movie) {
         view?.findViewById<ImageView>(R.id.imageView)
-                ?.load(movie.imageUrl)
+                ?.load(Constants.POSTER_URL + movie.posterPath)
 
-        view?.findViewById<TextView>(R.id.age)?.text = context?.getString(R.string.age, movie.pgAge)
+        val age = if (movie.adult!!) 18 else 12
+
+        view?.findViewById<TextView>(R.id.age)?.text = context?.getString(R.string.age, age)
 
         view?.findViewById<TextView>(R.id.movie_title)?.text = movie.title
-        view?.findViewById<TextView>(R.id.genre)?.text = movie.genres.joinToString { it.name }
-        view?.findViewById<TextView>(R.id.reviews)?.text = context?.getString(R.string.reviews, movie.reviewCount)
-        view?.findViewById<TextView>(R.id.description)?.text = movie.storyLine
+        view?.findViewById<TextView>(R.id.genre)?.text = movie.genres.joinToString { it.name.toString() }
+        view?.findViewById<TextView>(R.id.reviews)?.text = context?.getString(R.string.reviews, movie.voteCount)
+        view?.findViewById<TextView>(R.id.description)?.text = movie.overview
 
         val starsImages = listOf<ImageView?>(
                 view?.findViewById(R.id.star1),
@@ -79,19 +98,21 @@ class FragmentMovieDetails : Fragment() {
         )
         starsImages.forEachIndexed { index, imageView ->
             imageView?.let {
-                val colorId =
-                        if (movie.rating > index) R.color.radical_red else R.color.storm_gray
+                val colorId = if (ceil((movie.voteAverage!!.div(2))) > index)
+                    R.color.radical_red
+                else
+                    R.color.storm_gray
                 ImageViewCompat.setImageTintList(
                         imageView, ColorStateList.valueOf(
                         ContextCompat.getColor(imageView.context, colorId)
-                )
+                    )
                 )
             }
         }
     }
 
-    private fun showMovieNotFoundError() {
-        Toast.makeText(requireContext(), R.string.error_movie_not_found, Toast.LENGTH_LONG)
+    private fun showMovieNotFoundError(message: String?) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG)
             .show()
     }
 
@@ -99,7 +120,7 @@ class FragmentMovieDetails : Fragment() {
         private const val PARAM_MOVIE_DATA = "movie_data"
 
         @JvmStatic
-        fun newInstance(movieId: Int) =
+        fun newInstance(movieId: Int?) =
                 FragmentMovieDetails().apply {
                     arguments = bundleOf(
                             PARAM_MOVIE_DATA to movieId

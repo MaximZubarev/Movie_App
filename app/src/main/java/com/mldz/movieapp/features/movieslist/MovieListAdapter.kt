@@ -14,10 +14,11 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.RoundedCornersTransformation
 import com.mldz.movieapp.R
-import com.mldz.movieapp.models.Movie
+import com.mldz.movieapp.data.model.MovieListItem
+import com.mldz.movieapp.utils.Constants
 
 
-class MovieListAdapter(private val onClickCard: (item: Movie) -> Unit): ListAdapter<Movie, MovieListAdapter.MovieViewHolder>(DiffCallback()) {
+class MovieListAdapter(private val onClickCard: (item: Int?) -> Unit): ListAdapter<MovieListItem, MovieListAdapter.MovieViewHolder>(DiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
         return MovieViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.view_holder_movie, parent, false))
     }
@@ -44,28 +45,28 @@ class MovieListAdapter(private val onClickCard: (item: Movie) -> Unit): ListAdap
                 itemView.findViewById(R.id.movie_rating_star5_image)
         )
 
-        fun bind(movie: Movie, onClickCard: (item: Movie) -> Unit) {
-            title.text = movie.title
-            genre.text = movie.genres.joinToString { it.name }
-            reviews.text = itemView.context.getString(R.string.reviews, movie.reviewCount)
-            duration.text = itemView.context.getString(R.string.movies_list_film_time, movie.runningTime)
-            age.text = movie.pgAge.toString()
+        fun bind(movieListItem: MovieListItem, onClickCard: (item: Int?) -> Unit) {
+            title.text = movieListItem.title
+            genre.text = movieListItem.genreIds.joinToString { it.toString() }
+            reviews.text = itemView.context.getString(R.string.reviews, movieListItem.voteCount)
+//            duration.text = itemView.context.getString(R.string.movies_list_film_time, movie.runningTime)
+//            age.text = movie.pgAge.toString()
 
-            poster.load(movie.imageUrl) {
+            poster.load(Constants.POSTER_URL + movieListItem.posterPath) {
                 placeholder(R.drawable.movie_avengers)
                 transformations(RoundedCornersTransformation(15f, 15f, 0f,0f))
             }
-
-            if (movie.isLiked) {
-                ImageViewCompat.setImageTintList(
-                        like, ColorStateList.valueOf(
-                        ContextCompat.getColor(like.context, R.color.radical_red)
-                    )
-                )
-            }
+//
+//            if (movie.isLiked) {
+//                ImageViewCompat.setImageTintList(
+//                        like, ColorStateList.valueOf(
+//                        ContextCompat.getColor(like.context, R.color.radical_red)
+//                    )
+//                )
+//            }
 
             starsImages.forEachIndexed { index, imageView ->
-                val colorId = if (movie.rating > index) R.color.radical_red else R.color.storm_gray
+                val colorId = if ((movieListItem.voteAverage?.toInt()!! / 2) > index) R.color.radical_red else R.color.storm_gray
                 ImageViewCompat.setImageTintList(
                         imageView, ColorStateList.valueOf(
                         ContextCompat.getColor(imageView.context, colorId)
@@ -74,17 +75,17 @@ class MovieListAdapter(private val onClickCard: (item: Movie) -> Unit): ListAdap
             }
 
             container.setOnClickListener{
-                onClickCard(movie)
+                onClickCard(movieListItem.id)
             }
         }
     }
 
-    class DiffCallback: DiffUtil.ItemCallback<Movie>() {
-        override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean {
+    class DiffCallback: DiffUtil.ItemCallback<MovieListItem>() {
+        override fun areItemsTheSame(oldItem: MovieListItem, newItem: MovieListItem): Boolean {
             return oldItem.title == newItem.title
         }
 
-        override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean {
+        override fun areContentsTheSame(oldItem: MovieListItem, newItem: MovieListItem): Boolean {
             return oldItem == newItem
         }
 

@@ -1,14 +1,16 @@
 package com.mldz.movieapp.features.moviesdetails
 
 import androidx.lifecycle.*
-import com.mldz.movieapp.data.MovieRepository
-import com.mldz.movieapp.models.Movie
+import com.mldz.movieapp.data.model.Movie
+import com.mldz.movieapp.data.model.MovieListItem
+import com.mldz.movieapp.data.repository.MovieRepository
+import com.mldz.movieapp.utils.Resource
 import kotlinx.coroutines.launch
 
 
 class MovieDetailsViewModel(private val repository: MovieRepository): ViewModel() {
-    private val _movie = MutableLiveData<Movie>()
-    val movie: LiveData<Movie> = _movie
+    private val _movie = MutableLiveData<Resource<Movie>>()
+    val localMovie: LiveData<Resource<Movie>> = _movie
 
     fun loadMovie(movieId: Int) {
         viewModelScope.launch {

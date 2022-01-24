@@ -10,14 +10,24 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mldz.movieapp.R
-import com.mldz.movieapp.data.JsonMovieRepository
+import com.mldz.movieapp.data.network.ApiClient
+import com.mldz.movieapp.data.network.RetrofitBuilder
+import com.mldz.movieapp.data.repository.ConfigRepository
+import com.mldz.movieapp.data.repository.RemoteMovieRepository
 import com.mldz.movieapp.list.MovieListAdapter
-import com.mldz.movieapp.models.Movie
+import com.mldz.movieapp.utils.Status
 
 
 class FragmentMoviesList: Fragment() {
-    private val viewModelFactory by lazy { MovieListViewModel.Factory(JsonMovieRepository(requireActivity())) }
-    private val viewModel by lazy { ViewModelProvider(requireActivity(), viewModelFactory).get(MovieListViewModel::class.java) }
+    private val viewModelFactory by lazy {
+        MovieListViewModel.Factory(
+            RemoteMovieRepository(ApiClient(RetrofitBuilder.apiService)),
+            ConfigRepository(ApiClient(RetrofitBuilder.apiService))
+        )
+    }
+    private val viewModel by lazy {
+        ViewModelProvider(requireActivity(), viewModelFactory).get(MovieListViewModel::class.java)
+    }
 
     private var movieClickListener: onMovieClick? = null
 
@@ -39,8 +49,20 @@ class FragmentMoviesList: Fragment() {
     }
 
     private fun loadDataToAdapter(adapter: MovieListAdapter) {
-        viewModel.movies.observe(viewLifecycleOwner, { movieList ->
-            adapter.submitList(movieList)
+        viewModel.response.observe(viewLifecycleOwner, {
+            it.let { resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        adapter.submitList(resource.data?.results)
+                    }
+                    Status.ERROR -> {
+
+                    }
+                    Status.LOADING -> {
+
+                    }
+                }
+            }
         })
     }
 
@@ -67,6 +89,6 @@ class FragmentMoviesList: Fragment() {
     }
 
     interface onMovieClick {
-        fun onItemClick(movie: Movie)
+        fun onItemClick(movieId: Int?)
     }
 }
