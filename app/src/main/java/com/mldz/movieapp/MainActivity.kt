@@ -3,8 +3,8 @@ package com.mldz.movieapp
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.mldz.movieapp.features.moviesdetails.FragmentMovieDetails
-import com.mldz.movieapp.features.movieslist.FragmentMoviesList
+import com.mldz.movieapp.presentation.moviesdetails.FragmentMovieDetails
+import com.mldz.movieapp.presentation.movieslist.FragmentMoviesList
 
 class MainActivity : AppCompatActivity(), FragmentMoviesList.onMovieClick {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity(), FragmentMoviesList.onMovieClick {
                 }
     }
 
-    override fun onItemClick(movieId: Int?) {
+    override fun onItemClick(movieId: Long) {
         replaceFragment(FragmentMovieDetails.newInstance(movieId), true)
     }
 }
