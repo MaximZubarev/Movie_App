@@ -2,8 +2,9 @@ package com.mldz.movieapp.framework.remote
 
 import com.mldz.core.data.MovieDataSource
 import com.mldz.core.domain.Movie
+import com.mldz.core.domain.MovieDetails
 import com.mldz.core.domain.Result
-import com.mldz.movieapp.utils.toMovie
+import com.mldz.movieapp.utils.toMovieDetails
 
 
 class RemoteDataSource(private val apiService: ApiService): MovieDataSource {
@@ -15,7 +16,7 @@ class RemoteDataSource(private val apiService: ApiService): MovieDataSource {
             val response = apiService.getMovies()
             if (response.isSuccessful) {
                 response.body().let {
-                    Result.Success(response.body()!!.results.map { it.toMovie() })
+                    Result.Success(response.body()!!.results.map { it.toMovieDetails() })
                 }
             } else {
                 Result.Error(Throwable(response.errorBody().toString()))
@@ -25,12 +26,12 @@ class RemoteDataSource(private val apiService: ApiService): MovieDataSource {
         }
     }
 
-    override suspend fun getMovie(id: Long): Result<Movie> {
+    override suspend fun getMovie(id: Long): Result<MovieDetails> {
         return try {
             val response = apiService.getMovie(id)
             if (response.isSuccessful) {
                 response.body().let {
-                    Result.Success(response.body()!!.toMovie())
+                    Result.Success(response.body()!!.toMovieDetails())
                 }
             } else {
                 Result.Error(Throwable(response.errorBody().toString()))

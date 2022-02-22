@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import com.mldz.movieapp.presentation.moviesdetails.FragmentMovieDetails
 import com.mldz.movieapp.presentation.movieslist.FragmentMoviesList
 
-class MainActivity : AppCompatActivity(), FragmentMoviesList.onMovieClick {
+class MainActivity : AppCompatActivity(), FragmentMoviesList.OnMovieClick {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

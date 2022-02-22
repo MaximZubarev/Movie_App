@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mldz.core.data.MovieRepository
 import com.mldz.core.usecases.GetMovies
 import com.mldz.movieapp.R
+import com.mldz.movieapp.databinding.FragmentMovieListBinding
 import com.mldz.movieapp.framework.remote.RemoteDataSource
 import com.mldz.movieapp.framework.remote.RetrofitBuilder
 import com.mldz.movieapp.utils.Status
@@ -27,22 +28,24 @@ class FragmentMoviesList: Fragment() {
         ViewModelProvider(requireActivity(), viewModelFactory).get(MovieListViewModel::class.java)
     }
 
-    private var movieClickListener: onMovieClick? = null
+    private lateinit var binding: FragmentMovieListBinding
+
+    private var movieClickListener: OnMovieClick? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_movie_list, container, false)
+    ): View {
+        binding = FragmentMovieListBinding.inflate(inflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val movieList = view.findViewById<RecyclerView>(R.id.rv_movie_list)
         val adapter = MovieListAdapter{ item -> movieClickListener?.onItemClick(item) }
-        movieList.layoutManager = GridLayoutManager(context, 2)
-        movieList.adapter = adapter
+        binding.rvMovieList.layoutManager = GridLayoutManager(context, 2)
+        binding.rvMovieList.adapter = adapter
         loadDataToAdapter(adapter)
     }
 
@@ -62,11 +65,28 @@ class FragmentMoviesList: Fragment() {
                 }
             }
         })
+
+        viewModel.loading.observe(viewLifecycleOwner, {
+            setLoading(it)
+        })
+    }
+
+    private fun setLoading(isLoading: Boolean) {
+        when (isLoading) {
+            true -> {
+                binding.progressBar.visibility = View.VISIBLE
+                binding.rvMovieList.visibility = View.GONE
+            }
+            false -> {
+                binding.progressBar.visibility = View.GONE
+                binding.rvMovieList.visibility = View.VISIBLE
+            }
+        }
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is onMovieClick) {
+        if (context is OnMovieClick) {
             movieClickListener = context
         }
     }
@@ -86,7 +106,7 @@ class FragmentMoviesList: Fragment() {
         movieClickListener = null
     }
 
-    interface onMovieClick {
+    interface OnMovieClick {
         fun onItemClick(movieId: Long)
     }
 }

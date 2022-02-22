@@ -17,9 +17,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.mldz.core.data.MovieRepository
-import com.mldz.core.domain.Movie
+import com.mldz.core.domain.MovieDetails
 import com.mldz.core.usecases.GetMovie
 import com.mldz.movieapp.R
+import com.mldz.movieapp.databinding.FragmentMovieDetailsBinding
 import com.mldz.movieapp.framework.remote.RemoteDataSource
 import com.mldz.movieapp.framework.remote.RetrofitBuilder
 import com.mldz.movieapp.utils.Constants
@@ -32,13 +33,16 @@ class FragmentMovieDetails : Fragment() {
     ) }
     private val viewModel by lazy { ViewModelProvider(requireActivity(), viewModelFactory).get(MovieDetailsViewModel::class.java) }
 
+    private lateinit var binding: FragmentMovieDetailsBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_movie_details, container, false)
+                              savedInstanceState: Bundle?): View {
+        binding = FragmentMovieDetailsBinding.inflate(inflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,9 +50,8 @@ class FragmentMovieDetails : Fragment() {
         val movieId = arguments?.getSerializable(PARAM_MOVIE_DATA) as? Long ?: return
 
         val adapter = ActorListAdapter()
-        val actorsList = view.findViewById<RecyclerView>(R.id.rv_actor_list)
-        actorsList.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
-        actorsList.adapter = adapter
+        binding.rvActorList.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+        binding.rvActorList.adapter = adapter
 
         loadMovie(movieId, adapter)
     }
@@ -73,9 +76,13 @@ class FragmentMovieDetails : Fragment() {
                 }
             }
         })
+
+        viewModel.loading.observe(viewLifecycleOwner, {
+            showProgressBar(it)
+        })
     }
 
-    private fun updateMovieDetailsInfo(movie: Movie) {
+    private fun updateMovieDetailsInfo(movie: MovieDetails) {
         view?.findViewById<ImageView>(R.id.imageView)
                 ?.load(Constants.POSTER_URL + movie.image)
 
@@ -86,7 +93,7 @@ class FragmentMovieDetails : Fragment() {
         view?.findViewById<TextView>(R.id.movie_title)?.text = movie.title
         view?.findViewById<TextView>(R.id.genre)?.text = movie.genres.joinToString { it.name.toString() }
         view?.findViewById<TextView>(R.id.reviews)?.text = context?.getString(R.string.reviews, movie.reviewsCount)
-//        view?.findViewById<TextView>(R.id.description)?.text = movie.overview
+        view?.findViewById<TextView>(R.id.description)?.text = movie.story
 
         val starsImages = listOf<ImageView?>(
                 view?.findViewById(R.id.star1),
@@ -113,6 +120,19 @@ class FragmentMovieDetails : Fragment() {
     private fun showMovieNotFoundError(message: String?) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG)
             .show()
+    }
+
+    private fun showProgressBar(show: Boolean) {
+        when (show) {
+            true -> {
+                binding.progressBar.visibility = View.VISIBLE
+                binding.scrollView.visibility = View.GONE
+            }
+            false -> {
+                binding.progressBar.visibility = View.GONE
+                binding.scrollView.visibility = View.VISIBLE
+            }
+        }
     }
 
     companion object {

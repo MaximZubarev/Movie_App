@@ -1,7 +1,6 @@
 package com.mldz.movieapp.framework.remote.model
 
 import com.google.gson.annotations.SerializedName
-import com.mldz.core.domain.Movie
 
 
 data class MovieList(

@@ -18,16 +18,21 @@ class MovieListViewModel(
     private val _response = MutableLiveData<Resource<List<Movie>>>()
     val response = _response
 
+    private val _loading = MutableLiveData<Boolean>()
+    val loading = _loading
+
     init {
         loadMovies()
     }
 
     private fun loadMovies() {
+        loading.postValue(true)
         viewModelScope.launch {
             when (val result = getMovies.invoke()) {
                 is Result.Error -> onError(result.throwable)
                 is Result.Success -> onSuccess(result.data)
             }
+            loading.postValue(false)
         }
     }
 
