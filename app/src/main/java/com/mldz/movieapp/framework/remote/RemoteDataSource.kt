@@ -4,6 +4,7 @@ import com.mldz.core.data.MovieDataSource
 import com.mldz.core.domain.Movie
 import com.mldz.core.domain.MovieDetails
 import com.mldz.core.domain.Result
+import com.mldz.movieapp.utils.toMovie
 import com.mldz.movieapp.utils.toMovieDetails
 
 
@@ -16,7 +17,7 @@ class RemoteDataSource(private val apiService: ApiService): MovieDataSource {
             val response = apiService.getMovies()
             if (response.isSuccessful) {
                 response.body().let {
-                    Result.Success(response.body()!!.results.map { it.toMovieDetails() })
+                    Result.Success(response.body()!!.results.map { it.toMovie() })
                 }
             } else {
                 Result.Error(Throwable(response.errorBody().toString()))

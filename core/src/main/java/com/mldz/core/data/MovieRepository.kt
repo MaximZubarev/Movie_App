@@ -5,12 +5,15 @@ import com.mldz.core.domain.MovieDetails
 import com.mldz.core.domain.Result
 
 
-class MovieRepository(private val dataSource: MovieDataSource) {
+class MovieRepository(
+    private val remoteDataSource: MovieDataSource,
+    private val localDataSource: MovieDataSource
+) {
     suspend fun getMovies(): Result<List<Movie>> {
-        return dataSource.getMovies()
+        return remoteDataSource.getMovies().also {  }
     }
 
     suspend fun getMovie(id: Long): Result<MovieDetails> {
-        return dataSource.getMovie(id)
+        return remoteDataSource.getMovie(id)
     }
 }

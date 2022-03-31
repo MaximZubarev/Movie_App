@@ -21,6 +21,8 @@ import com.mldz.core.domain.MovieDetails
 import com.mldz.core.usecases.GetMovie
 import com.mldz.movieapp.R
 import com.mldz.movieapp.databinding.FragmentMovieDetailsBinding
+import com.mldz.movieapp.framework.local.AppDatabase
+import com.mldz.movieapp.framework.local.LocalDataSource
 import com.mldz.movieapp.framework.remote.RemoteDataSource
 import com.mldz.movieapp.framework.remote.RetrofitBuilder
 import com.mldz.movieapp.utils.Constants
@@ -29,7 +31,10 @@ import kotlin.math.ceil
 
 class FragmentMovieDetails : Fragment() {
     private val viewModelFactory by lazy { MovieDetailsViewModel.Factory(
-        GetMovie(MovieRepository(RemoteDataSource(RetrofitBuilder.apiService)))
+        GetMovie(MovieRepository(
+            RemoteDataSource(RetrofitBuilder.apiService),
+            LocalDataSource(AppDatabase.invoke(requireContext()).movieDao)
+        ))
     ) }
     private val viewModel by lazy { ViewModelProvider(requireActivity(), viewModelFactory).get(MovieDetailsViewModel::class.java) }
 

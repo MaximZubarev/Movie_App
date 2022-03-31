@@ -8,11 +8,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.mldz.core.data.MovieRepository
 import com.mldz.core.usecases.GetMovies
-import com.mldz.movieapp.R
 import com.mldz.movieapp.databinding.FragmentMovieListBinding
+import com.mldz.movieapp.framework.local.AppDatabase
+import com.mldz.movieapp.framework.local.LocalDataSource
 import com.mldz.movieapp.framework.remote.RemoteDataSource
 import com.mldz.movieapp.framework.remote.RetrofitBuilder
 import com.mldz.movieapp.utils.Status
@@ -21,7 +21,10 @@ import com.mldz.movieapp.utils.Status
 class FragmentMoviesList: Fragment() {
     private val viewModelFactory by lazy {
         MovieListViewModel.Factory(
-            GetMovies(MovieRepository(RemoteDataSource(RetrofitBuilder.apiService)))
+            GetMovies(MovieRepository(
+                RemoteDataSource(RetrofitBuilder.apiService),
+                LocalDataSource(AppDatabase.invoke(requireContext()).movieDao)
+            ))
         )
     }
     private val viewModel by lazy {
