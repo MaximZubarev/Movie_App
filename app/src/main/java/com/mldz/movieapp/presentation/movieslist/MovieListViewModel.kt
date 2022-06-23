@@ -1,60 +1,66 @@
 package com.mldz.movieapp.presentation.movieslist
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import com.mldz.core.domain.Movie
-import com.mldz.core.domain.Result
+import androidx.lifecycle.*
+import com.mldz.core.common.Result
+import com.mldz.core.usecases.FetchMovies
 import com.mldz.core.usecases.GetMovies
-import com.mldz.movieapp.utils.Resource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MovieListViewModel(
-        private val getMovies: GetMovies
+        private val getMovies: GetMovies,
+        private val fetchMovies: FetchMovies
     ): ViewModel() {
 
-    private val _response = MutableLiveData<Resource<List<Movie>>>()
-    val response = _response
+    private val _movies = getMovies
+        .invoke()
+        .catch { onError(it) }
+        .asLiveData()
+
+    val movies = _movies
 
     private val _loading = MutableLiveData<Boolean>()
     val loading = _loading
+
+    private val _error = MutableLiveData<String>()
+    val error = _error
 
     init {
         loadMovies()
     }
 
     private fun loadMovies() {
-        loading.postValue(true)
         viewModelScope.launch {
-            when (val result = getMovies.invoke()) {
-                is Result.Error -> onError(result.throwable)
-                is Result.Success -> onSuccess(result.data)
+            val result = withContext(Dispatchers.IO) {
+                try {
+                    fetchMovies.invoke()
+                } catch (e: Exception) {
+                    onError(e)
+                }
+            }
+            if (result is Result.Error) {
+                onError(result.throwable)
             }
             loading.postValue(false)
         }
     }
 
-    private fun onSuccess(movies: List<Movie>) {
-        if (movies.isEmpty()) {
-            _response.postValue(Resource.success(listOf()))
-        } else {
-            _response.postValue(Resource.success(movies))
-        }
-    }
-
     private fun onError(e: Throwable) {
-        _response.postValue(Resource.error(null, e.message.toString()))
+        _error.postValue(e.message)
     }
 
     class Factory(
-            private val getMovies: GetMovies
+            private val getMovies: GetMovies,
+            private val fetchMovies: FetchMovies
         ) : ViewModelProvider.NewInstanceFactory() {
 
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return MovieListViewModel(
-                getMovies = getMovies
+                getMovies = getMovies,
+                fetchMovies = fetchMovies
             ) as T
         }
     }

@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity(), FragmentMoviesList.OnMovieClick {
                 }
     }
 
-    override fun onItemClick(movieId: Long) {
+    override fun onItemClick(movieId: String) {
         replaceFragment(FragmentMovieDetails.newInstance(movieId), true)
     }
 }

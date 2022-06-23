@@ -13,12 +13,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.RoundedCornersTransformation
-import com.mldz.core.domain.Movie
+import com.mldz.core.entities.Movie
 import com.mldz.movieapp.R
 import com.mldz.movieapp.utils.Constants
 
 
-class MovieListAdapter(private val onClickCard: (item: Long) -> Unit): ListAdapter<Movie, MovieListAdapter.MovieViewHolder>(
+class MovieListAdapter(private val onClickCard: (item: String) -> Unit): ListAdapter<Movie, MovieListAdapter.MovieViewHolder>(
     DiffCallback()
 ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
@@ -47,15 +47,14 @@ class MovieListAdapter(private val onClickCard: (item: Long) -> Unit): ListAdapt
                 itemView.findViewById(R.id.movie_rating_star5_image)
         )
 
-        fun bind(movieListItem: Movie, onClickCard: (item: Long) -> Unit) {
+        fun bind(movieListItem: Movie, onClickCard: (item: String) -> Unit) {
             title.text = movieListItem.title
             genre.text = movieListItem.genres.joinToString { it.toString() }
             reviews.text = itemView.context.getString(R.string.reviews, movieListItem.reviewsCount)
 //            duration.text = itemView.context.getString(R.string.movies_list_film_time, movie.runningTime)
 //            age.text = movie.pgAge.toString()
 
-            poster.load(Constants.POSTER_URL + movieListItem.image) {
-                placeholder(R.drawable.movie_avengers)
+            poster.load(movieListItem.image) {
                 transformations(RoundedCornersTransformation(15f, 15f, 0f,0f))
             }
 //
@@ -67,14 +66,14 @@ class MovieListAdapter(private val onClickCard: (item: Long) -> Unit): ListAdapt
 //                )
 //            }
 
-            starsImages.forEachIndexed { index, imageView ->
-                val colorId = if ((movieListItem.reviewsCount / 2) > index) R.color.radical_red else R.color.storm_gray
-                ImageViewCompat.setImageTintList(
-                        imageView, ColorStateList.valueOf(
-                        ContextCompat.getColor(imageView.context, colorId)
-                    )
-                )
-            }
+//            starsImages.forEachIndexed { index, imageView ->
+//                val colorId = if ((movieListItem.reviewsCount / 2) > index) R.color.radical_red else R.color.storm_gray
+//                ImageViewCompat.setImageTintList(
+//                        imageView, ColorStateList.valueOf(
+//                        ContextCompat.getColor(imageView.context, colorId)
+//                    )
+//                )
+//            }
 
             container.setOnClickListener{
                 onClickCard(movieListItem.id)

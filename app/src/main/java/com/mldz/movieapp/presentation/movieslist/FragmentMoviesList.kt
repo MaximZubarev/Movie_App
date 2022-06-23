@@ -5,26 +5,52 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
-import com.mldz.core.data.MovieRepository
+import com.mldz.core.usecases.FetchMovies
 import com.mldz.core.usecases.GetMovies
+import com.mldz.data2.api.RetrofitBuilder
+import com.mldz.data2.db.AppDatabase
+import com.mldz.data2.mappers.MovieApiMapper
+import com.mldz.data2.mappers.MovieEntityMapper
+import com.mldz.data2.repositories.movie.MovieLocalDataSourceImpl
+import com.mldz.data2.repositories.movie.MovieRemoteDataSourceImpl
+import com.mldz.data2.repositories.movie.MovieRepositoryImpl
 import com.mldz.movieapp.databinding.FragmentMovieListBinding
-import com.mldz.movieapp.framework.local.AppDatabase
-import com.mldz.movieapp.framework.local.LocalDataSource
-import com.mldz.movieapp.framework.remote.RemoteDataSource
-import com.mldz.movieapp.framework.remote.RetrofitBuilder
-import com.mldz.movieapp.utils.Status
+import kotlinx.coroutines.Dispatchers
 
 
 class FragmentMoviesList: Fragment() {
     private val viewModelFactory by lazy {
         MovieListViewModel.Factory(
-            GetMovies(MovieRepository(
-                RemoteDataSource(RetrofitBuilder.apiService),
-                LocalDataSource(AppDatabase.invoke(requireContext()).movieDao)
-            ))
+            GetMovies(
+                MovieRepositoryImpl(
+                    MovieRemoteDataSourceImpl(
+                        RetrofitBuilder.apiService,
+                        MovieApiMapper()
+                    ),
+                    MovieLocalDataSourceImpl(
+                        AppDatabase.getInstance(requireContext()).movieDao,
+                        Dispatchers.IO,
+                        MovieEntityMapper()
+                    )
+                )
+            ),
+            FetchMovies(
+                MovieRepositoryImpl(
+                    MovieRemoteDataSourceImpl(
+                        RetrofitBuilder.apiService,
+                        MovieApiMapper()
+                    ),
+                    MovieLocalDataSourceImpl(
+                        AppDatabase.getInstance(requireContext()).movieDao,
+                        Dispatchers.IO,
+                        MovieEntityMapper()
+                    )
+                )
+            )
         )
     }
     private val viewModel by lazy {
@@ -53,25 +79,17 @@ class FragmentMoviesList: Fragment() {
     }
 
     private fun loadDataToAdapter(adapter: MovieListAdapter) {
-        viewModel.response.observe(viewLifecycleOwner, {
-            it.let { resource ->
-                when (resource.status) {
-                    Status.SUCCESS -> {
-                        adapter.submitList(resource.data!!)
-                    }
-                    Status.ERROR -> {
+        viewModel.movies.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
 
-                    }
-                    Status.LOADING -> {
-
-                    }
-                }
-            }
-        })
-
-        viewModel.loading.observe(viewLifecycleOwner, {
+        viewModel.loading.observe(viewLifecycleOwner) {
             setLoading(it)
-        })
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setLoading(isLoading: Boolean) {
@@ -110,6 +128,6 @@ class FragmentMoviesList: Fragment() {
     }
 
     interface OnMovieClick {
-        fun onItemClick(movieId: Long)
+        fun onItemClick(movieId: String)
     }
 }

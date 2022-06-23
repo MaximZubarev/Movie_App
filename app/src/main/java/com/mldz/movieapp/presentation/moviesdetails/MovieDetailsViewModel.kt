@@ -1,49 +1,78 @@
 package com.mldz.movieapp.presentation.moviesdetails
 
-import androidx.lifecycle.*
-import com.mldz.core.domain.Movie
-import com.mldz.core.domain.MovieDetails
-import com.mldz.core.domain.Result
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.mldz.core.entities.MovieDetails
+import com.mldz.core.usecases.FetchMovie
 import com.mldz.core.usecases.GetMovie
-import com.mldz.movieapp.utils.Resource
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
-class MovieDetailsViewModel(private val getMovie: GetMovie): ViewModel() {
-    private val _movie = MutableLiveData<Resource<MovieDetails>>()
-    val movie: LiveData<Resource<MovieDetails>> = _movie
+class MovieDetailsViewModel(
+        private val getMovie: GetMovie,
+        private val fetchMovie: FetchMovie
+    ): ViewModel() {
+    private val _movie = MutableLiveData<MovieDetails>()
+    val movie = _movie
 
     private val _loading = MutableLiveData<Boolean>()
     val loading = _loading
 
-    fun loadMovie(movieId: Long) {
+    private val _error = MutableLiveData<String>()
+    val error = _error
+
+    fun loadMovie(movieId: String) {
         loading.value = true
-        viewModelScope.launch {
-            when (val result = getMovie.invoke(movieId)) {
-                is Result.Success -> onSuccess(result.data)
-                is Result.Error -> onError(result.throwable)
+        viewModelScope.launch() {
+            launch {
+                getMovie
+                    .invoke(movieId)
+                    .catch {
+                        emit(MovieDetails())
+                        onError(it)
+                    }
+                    .stateIn(
+                        scope = viewModelScope,
+                        started = SharingStarted.Eagerly,
+                        initialValue = MovieDetails(id = "t")
+                    )
+                    .collect {
+                        onSuccess(it)
+                        loading.setValue(false)
+                    }
             }
-            loading.postValue(false)
+
+            launch {
+                try {
+                    fetchMovie.invoke(movieId)
+                } catch (e: Exception) {
+                    onError(e)
+                }
+            }
         }
     }
 
     private fun onSuccess(movie: MovieDetails) {
-        if (movie.id > 0) {
-            _movie.postValue(Resource.success(movie))
-        } else {
-            _movie.postValue(Resource.error(null, "empty"))
-        }
+        _movie.postValue(movie)
     }
 
     private fun onError(e: Throwable) {
-        _movie.postValue(Resource.error(null, e.message.toString()))
+        _error.postValue(e.message)
     }
 
-    class Factory(private val getMovie: GetMovie) :
+    class Factory(private val getMovie: GetMovie, private val fetchMovie: FetchMovie) :
         ViewModelProvider.NewInstanceFactory() {
 
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return MovieDetailsViewModel(getMovie = getMovie) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return MovieDetailsViewModel(
+                getMovie = getMovie,
+                fetchMovie = fetchMovie
+            ) as T
         }
     }
 }

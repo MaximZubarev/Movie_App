@@ -2,6 +2,7 @@ package com.mldz.movieapp.presentation.moviesdetails
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,26 +17,54 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.mldz.core.data.MovieRepository
-import com.mldz.core.domain.MovieDetails
+import com.mldz.core.entities.Movie
+import com.mldz.core.entities.MovieDetails
+import com.mldz.core.usecases.FetchMovie
 import com.mldz.core.usecases.GetMovie
 import com.mldz.movieapp.R
 import com.mldz.movieapp.databinding.FragmentMovieDetailsBinding
-import com.mldz.movieapp.framework.local.AppDatabase
-import com.mldz.movieapp.framework.local.LocalDataSource
-import com.mldz.movieapp.framework.remote.RemoteDataSource
-import com.mldz.movieapp.framework.remote.RetrofitBuilder
+import com.mldz.data2.db.AppDatabase
+import com.mldz.data2.api.RetrofitBuilder
+import com.mldz.data2.mappers.MovieApiMapper
+import com.mldz.data2.mappers.MovieEntityMapper
+import com.mldz.data2.repositories.movie.MovieLocalDataSourceImpl
+import com.mldz.data2.repositories.movie.MovieRemoteDataSourceImpl
+import com.mldz.data2.repositories.movie.MovieRepositoryImpl
 import com.mldz.movieapp.utils.Constants
 import com.mldz.movieapp.utils.Status
+import kotlinx.coroutines.Dispatchers
 import kotlin.math.ceil
 
 class FragmentMovieDetails : Fragment() {
     private val viewModelFactory by lazy { MovieDetailsViewModel.Factory(
-        GetMovie(MovieRepository(
-            RemoteDataSource(RetrofitBuilder.apiService),
-            LocalDataSource(AppDatabase.invoke(requireContext()).movieDao)
-        ))
-    ) }
+        GetMovie(
+            MovieRepositoryImpl(
+                MovieRemoteDataSourceImpl(
+                    RetrofitBuilder.apiService,
+                    MovieApiMapper()
+                ),
+                MovieLocalDataSourceImpl(
+                    AppDatabase.getInstance(requireContext()).movieDao,
+                    Dispatchers.IO,
+                    MovieEntityMapper()
+                )
+            )
+        ),
+        FetchMovie(
+            MovieRepositoryImpl(
+                MovieRemoteDataSourceImpl(
+                    RetrofitBuilder.apiService,
+                    MovieApiMapper()
+                ),
+                MovieLocalDataSourceImpl(
+                    AppDatabase.getInstance(requireContext()).movieDao,
+                    Dispatchers.IO,
+                    MovieEntityMapper()
+                )
+            )
+        )
+    )
+    }
     private val viewModel by lazy { ViewModelProvider(requireActivity(), viewModelFactory).get(MovieDetailsViewModel::class.java) }
 
     private lateinit var binding: FragmentMovieDetailsBinding
@@ -52,7 +81,7 @@ class FragmentMovieDetails : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val movieId = arguments?.getSerializable(PARAM_MOVIE_DATA) as? Long ?: return
+        val movieId = arguments?.getSerializable(PARAM_MOVIE_DATA) as? String ?: return
 
         val adapter = ActorListAdapter()
         binding.rvActorList.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
@@ -61,70 +90,62 @@ class FragmentMovieDetails : Fragment() {
         loadMovie(movieId, adapter)
     }
 
-    private fun loadMovie(movieId: Long, adapter: ActorListAdapter) {
+    private fun loadMovie(movieId: String, adapter: ActorListAdapter) {
         viewModel.loadMovie(movieId)
-        viewModel.movie.observe(viewLifecycleOwner, {
-            run {
-                it.let { resource ->
-                    when (resource.status) {
-                        Status.SUCCESS -> {
-                            updateMovieDetailsInfo(it.data!!)
-//                            adapter.submitList(movie.actors)
-                        }
-                        Status.ERROR -> {
-                            showMovieNotFoundError(it.message)
-                        }
-                        Status.LOADING -> {
-
-                        }
-                    }
-                }
+        viewModel.movie.observe(viewLifecycleOwner) {
+            if (it.id.isEmpty()) {
+                showMovieNotFoundError("")
+            } else {
+                updateMovieDetailsInfo(it)
             }
-        })
+        }
 
-        viewModel.loading.observe(viewLifecycleOwner, {
+        viewModel.loading.observe(viewLifecycleOwner) {
             showProgressBar(it)
-        })
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun updateMovieDetailsInfo(movie: MovieDetails) {
         view?.findViewById<ImageView>(R.id.imageView)
-                ?.load(Constants.POSTER_URL + movie.image)
+                ?.load(movie.image)
 
 //        val age = if (movie.adult!!) 18 else 12
 
 //        view?.findViewById<TextView>(R.id.age)?.text = context?.getString(R.string.age, age)
 
         view?.findViewById<TextView>(R.id.movie_title)?.text = movie.title
-        view?.findViewById<TextView>(R.id.genre)?.text = movie.genres.joinToString { it.name.toString() }
-        view?.findViewById<TextView>(R.id.reviews)?.text = context?.getString(R.string.reviews, movie.reviewsCount)
-        view?.findViewById<TextView>(R.id.description)?.text = movie.story
+        view?.findViewById<TextView>(R.id.genre)?.text = movie.genres
+        view?.findViewById<TextView>(R.id.reviews)?.text = context?.getString(R.string.reviews, movie.imDbRatingVotes)
+        view?.findViewById<TextView>(R.id.description)?.text = movie.plotLocal
 
-        val starsImages = listOf<ImageView?>(
-                view?.findViewById(R.id.star1),
-                view?.findViewById(R.id.star2),
-                view?.findViewById(R.id.star3),
-                view?.findViewById(R.id.star4),
-                view?.findViewById(R.id.star5)
-        )
-        starsImages.forEachIndexed { index, imageView ->
-            imageView?.let {
-                val colorId = if (ceil((movie.rating.div(2))) > index)
-                    R.color.radical_red
-                else
-                    R.color.storm_gray
-                ImageViewCompat.setImageTintList(
-                        imageView, ColorStateList.valueOf(
-                        ContextCompat.getColor(imageView.context, colorId)
-                    )
-                )
-            }
-        }
+//        val starsImages = listOf<ImageView?>(
+//                view?.findViewById(R.id.star1),
+//                view?.findViewById(R.id.star2),
+//                view?.findViewById(R.id.star3),
+//                view?.findViewById(R.id.star4),
+//                view?.findViewById(R.id.star5)
+//        )
+//        starsImages.forEachIndexed { index, imageView ->
+//            imageView?.let {
+//                val colorId = if (ceil((movie.rating.div(2))) > index)
+//                    R.color.radical_red
+//                else
+//                    R.color.storm_gray
+//                ImageViewCompat.setImageTintList(
+//                        imageView, ColorStateList.valueOf(
+//                        ContextCompat.getColor(imageView.context, colorId)
+//                    )
+//                )
+//            }
+//        }
     }
 
     private fun showMovieNotFoundError(message: String?) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG)
-            .show()
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
 
     private fun showProgressBar(show: Boolean) {
@@ -144,7 +165,7 @@ class FragmentMovieDetails : Fragment() {
         private const val PARAM_MOVIE_DATA = "movie_data"
 
         @JvmStatic
-        fun newInstance(movieId: Long) =
+        fun newInstance(movieId: String) =
                 FragmentMovieDetails().apply {
                     arguments = bundleOf(
                             PARAM_MOVIE_DATA to movieId
