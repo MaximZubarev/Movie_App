@@ -2,21 +2,23 @@ package com.mldz.movieapp.presentation.moviesdetails
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.mldz.core.entities.MovieDetails
 import com.mldz.core.usecases.FetchMovie
 import com.mldz.core.usecases.GetMovie
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
-class MovieDetailsViewModel(
-        private val getMovie: GetMovie,
-        private val fetchMovie: FetchMovie
-    ): ViewModel() {
+@HiltViewModel
+class MovieDetailsViewModel @Inject constructor(
+    private val getMovie: GetMovie,
+    private val fetchMovie: FetchMovie
+) : ViewModel() {
     private val _movie = MutableLiveData<MovieDetails>()
     val movie = _movie
 
@@ -63,16 +65,5 @@ class MovieDetailsViewModel(
 
     private fun onError(e: Throwable) {
         _error.postValue(e.message)
-    }
-
-    class Factory(private val getMovie: GetMovie, private val fetchMovie: FetchMovie) :
-        ViewModelProvider.NewInstanceFactory() {
-
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MovieDetailsViewModel(
-                getMovie = getMovie,
-                fetchMovie = fetchMovie
-            ) as T
-        }
     }
 }

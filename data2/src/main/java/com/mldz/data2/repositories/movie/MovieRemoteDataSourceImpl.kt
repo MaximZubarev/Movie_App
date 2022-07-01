@@ -1,14 +1,14 @@
 package com.mldz.data2.repositories.movie
 
-import com.mldz.core.entities.Movie
-import com.mldz.data2.api.model.BaseApiResponse
-import com.mldz.data2.mappers.MovieApiMapper
 import com.mldz.core.common.Result
+import com.mldz.core.entities.Movie
 import com.mldz.core.entities.MovieDetails
 import com.mldz.data2.api.ApiServiceImdb
+import com.mldz.data2.api.model.BaseApiResponse
+import com.mldz.data2.mappers.MovieApiMapper
 
 
-class MovieRemoteDataSourceImpl(
+class MovieRemoteDataSourceImpl (
     private val service: ApiServiceImdb,
     private val mapper: MovieApiMapper
 ): MovieRemoteDataSource, BaseApiResponse() {

@@ -4,9 +4,10 @@ import com.mldz.core.entities.Movie
 import com.mldz.core.entities.MovieDetails
 import com.mldz.data2.api.model.Item
 import com.mldz.data2.api.model.MovieResponse
+import javax.inject.Inject
 
 
-class MovieApiMapper {
+class MovieApiMapper @Inject constructor() {
     fun toMovie(movieResponse: Item): Movie {
         return Movie(
             id = movieResponse.id,

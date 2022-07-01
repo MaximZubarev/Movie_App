@@ -6,4 +6,5 @@ object Constants {
     private const val POSTER_SIZE = "w342"
 
     val POSTER_URL = IMAGE_BASE_URL + POSTER_SIZE
+    const val BASE_URL = "https://imdb-api.com/ru/API/"
 }

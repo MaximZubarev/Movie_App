@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.mldz.movieapp.presentation.moviesdetails.FragmentMovieDetails
 import com.mldz.movieapp.presentation.movieslist.FragmentMoviesList
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), FragmentMoviesList.OnMovieClick {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -16,13 +18,13 @@ class MainActivity : AppCompatActivity(), FragmentMoviesList.OnMovieClick {
 
     private fun replaceFragment(fragment: Fragment, backStack: Boolean) {
         supportFragmentManager.beginTransaction()
-                .apply {
-                    replace(R.id.frame_container, fragment, null)
-                    if (backStack) {
-                        addToBackStack(null)
-                    }
-                    commit()
+            .apply {
+                replace(R.id.frame_container, fragment, null)
+                if (backStack) {
+                    addToBackStack(null)
                 }
+                commit()
+            }
     }
 
     override fun onItemClick(movieId: String) {

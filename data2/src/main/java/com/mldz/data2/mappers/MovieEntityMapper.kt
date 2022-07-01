@@ -3,9 +3,10 @@ package com.mldz.data2.mappers
 import com.mldz.core.entities.Movie
 import com.mldz.core.entities.MovieDetails
 import com.mldz.data2.entities.MovieEntity
+import javax.inject.Inject
 
 
-class MovieEntityMapper {
+class MovieEntityMapper @Inject constructor() {
     fun toMovieEntity(movie: Movie): MovieEntity {
         return MovieEntity(
             id = movie.id,

@@ -1,77 +1,29 @@
 package com.mldz.movieapp.presentation.moviesdetails
 
-import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.mldz.core.entities.Movie
 import com.mldz.core.entities.MovieDetails
-import com.mldz.core.usecases.FetchMovie
-import com.mldz.core.usecases.GetMovie
 import com.mldz.movieapp.R
 import com.mldz.movieapp.databinding.FragmentMovieDetailsBinding
-import com.mldz.data2.db.AppDatabase
-import com.mldz.data2.api.RetrofitBuilder
-import com.mldz.data2.mappers.MovieApiMapper
-import com.mldz.data2.mappers.MovieEntityMapper
-import com.mldz.data2.repositories.movie.MovieLocalDataSourceImpl
-import com.mldz.data2.repositories.movie.MovieRemoteDataSourceImpl
-import com.mldz.data2.repositories.movie.MovieRepositoryImpl
-import com.mldz.movieapp.utils.Constants
-import com.mldz.movieapp.utils.Status
-import kotlinx.coroutines.Dispatchers
-import kotlin.math.ceil
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class FragmentMovieDetails : Fragment() {
-    private val viewModelFactory by lazy { MovieDetailsViewModel.Factory(
-        GetMovie(
-            MovieRepositoryImpl(
-                MovieRemoteDataSourceImpl(
-                    RetrofitBuilder.apiService,
-                    MovieApiMapper()
-                ),
-                MovieLocalDataSourceImpl(
-                    AppDatabase.getInstance(requireContext()).movieDao,
-                    Dispatchers.IO,
-                    MovieEntityMapper()
-                )
-            )
-        ),
-        FetchMovie(
-            MovieRepositoryImpl(
-                MovieRemoteDataSourceImpl(
-                    RetrofitBuilder.apiService,
-                    MovieApiMapper()
-                ),
-                MovieLocalDataSourceImpl(
-                    AppDatabase.getInstance(requireContext()).movieDao,
-                    Dispatchers.IO,
-                    MovieEntityMapper()
-                )
-            )
-        )
-    )
-    }
-    private val viewModel by lazy { ViewModelProvider(requireActivity(), viewModelFactory).get(MovieDetailsViewModel::class.java) }
-
     private lateinit var binding: FragmentMovieDetailsBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private val viewModel by viewModels<MovieDetailsViewModel>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {

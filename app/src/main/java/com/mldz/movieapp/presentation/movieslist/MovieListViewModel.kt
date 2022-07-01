@@ -1,16 +1,22 @@
 package com.mldz.movieapp.presentation.movieslist
 
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.mldz.core.common.Result
 import com.mldz.core.usecases.FetchMovies
 import com.mldz.core.usecases.GetMovies
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 
-class MovieListViewModel(
+@HiltViewModel
+class MovieListViewModel @Inject constructor(
         private val getMovies: GetMovies,
         private val fetchMovies: FetchMovies
     ): ViewModel() {
@@ -50,18 +56,5 @@ class MovieListViewModel(
 
     private fun onError(e: Throwable) {
         _error.postValue(e.message)
-    }
-
-    class Factory(
-            private val getMovies: GetMovies,
-            private val fetchMovies: FetchMovies
-        ) : ViewModelProvider.NewInstanceFactory() {
-
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MovieListViewModel(
-                getMovies = getMovies,
-                fetchMovies = fetchMovies
-            ) as T
-        }
     }
 }

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 
-class MovieLocalDataSourceImpl(
+class MovieLocalDataSourceImpl (
     private val movieDao: MovieDao,
     private val dispatcher: CoroutineDispatcher,
     private val movieEntityMapper: MovieEntityMapper

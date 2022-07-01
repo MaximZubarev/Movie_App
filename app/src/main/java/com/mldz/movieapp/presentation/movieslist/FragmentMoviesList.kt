@@ -7,55 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import com.mldz.core.usecases.FetchMovies
-import com.mldz.core.usecases.GetMovies
-import com.mldz.data2.api.RetrofitBuilder
-import com.mldz.data2.db.AppDatabase
-import com.mldz.data2.mappers.MovieApiMapper
-import com.mldz.data2.mappers.MovieEntityMapper
-import com.mldz.data2.repositories.movie.MovieLocalDataSourceImpl
-import com.mldz.data2.repositories.movie.MovieRemoteDataSourceImpl
-import com.mldz.data2.repositories.movie.MovieRepositoryImpl
 import com.mldz.movieapp.databinding.FragmentMovieListBinding
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class FragmentMoviesList: Fragment() {
-    private val viewModelFactory by lazy {
-        MovieListViewModel.Factory(
-            GetMovies(
-                MovieRepositoryImpl(
-                    MovieRemoteDataSourceImpl(
-                        RetrofitBuilder.apiService,
-                        MovieApiMapper()
-                    ),
-                    MovieLocalDataSourceImpl(
-                        AppDatabase.getInstance(requireContext()).movieDao,
-                        Dispatchers.IO,
-                        MovieEntityMapper()
-                    )
-                )
-            ),
-            FetchMovies(
-                MovieRepositoryImpl(
-                    MovieRemoteDataSourceImpl(
-                        RetrofitBuilder.apiService,
-                        MovieApiMapper()
-                    ),
-                    MovieLocalDataSourceImpl(
-                        AppDatabase.getInstance(requireContext()).movieDao,
-                        Dispatchers.IO,
-                        MovieEntityMapper()
-                    )
-                )
-            )
-        )
-    }
-    private val viewModel by lazy {
-        ViewModelProvider(requireActivity(), viewModelFactory).get(MovieListViewModel::class.java)
-    }
+    private val viewModel by viewModels<MovieListViewModel>()
 
     private lateinit var binding: FragmentMovieListBinding
 
