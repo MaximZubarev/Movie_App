@@ -28,10 +28,8 @@ import com.mldz.movieapp.models.Movie
 import com.mldz.movieapp.models.MovieMenuItem
 import com.mldz.movieapp.ui.*
 import com.mldz.movieapp.utils.NavigationItem
-import dagger.hilt.android.AndroidEntryPoint
 
 
-@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

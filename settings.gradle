@@ -1,5 +1,0 @@
-include ':app'
-rootProject.name = "Movie App"
-include ':data'
-include ':domain'
-include ':data2'
