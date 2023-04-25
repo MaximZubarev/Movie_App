@@ -42,20 +42,24 @@ android {
 
 dependencies {
 
+    implementation(project(path = ":module_injector"))
+    implementation(project(path = ":core_network_api"))
+    implementation(project(path = ":core_network_impl"))
+    implementation(project(path = ":core_design"))
+    implementation(project(path = ":feature_api"))
+    implementation(project(path = ":feature_main_impl"))
+    implementation(project(path = ":feature_main_api"))
     implementation(libs.coreKtx)
+    implementation(libs.bundles.lifecycle)
+    implementation(libs.dagger)
+    kapt(libs.dagger.compiler)
 
+    implementation(libs.coroutine)
     // UI
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.bundles.compose)
     implementation(libs.coil)
-
-    implementation(libs.bundles.lifecycle)
-
-    implementation(libs.coroutine)
-
     // Navigation
     implementation(libs.navigation)
-
-    implementation(libs.bundles.dagger)
 }

@@ -12,9 +12,15 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/data" />
-            <option value="$PROJECT_DIR$/data2" />
-            <option value="$PROJECT_DIR$/domain" />
+            <option value="$PROJECT_DIR$/buildSrc" />
+            <option value="$PROJECT_DIR$/core_design" />
+            <option value="$PROJECT_DIR$/core_network_api" />
+            <option value="$PROJECT_DIR$/core_network_impl" />
+            <option value="$PROJECT_DIR$/core_utils" />
+            <option value="$PROJECT_DIR$/feature_api" />
+            <option value="$PROJECT_DIR$/feature_main_api" />
+            <option value="$PROJECT_DIR$/feature_main_impl" />
+            <option value="$PROJECT_DIR$/module_injector" />
           </set>
         </option>
       </GradleProjectSettings>
