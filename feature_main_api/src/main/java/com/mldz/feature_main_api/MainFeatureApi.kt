@@ -5,5 +5,5 @@ import com.mldz.module_injector.BaseApi
 
 interface MainFeatureApi: BaseApi {
 
-    fun mainScreen(): MainScreen
+    fun mainScreen(): MainScreenStarter
 }

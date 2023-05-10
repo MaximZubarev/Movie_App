@@ -14,3 +14,7 @@ class App: Application() {
         appComponent = DaggerAppComponent.create()
     }
 }
+
+// TODO: reconnect
+// TODO: catch errors
+// TODO: reset component

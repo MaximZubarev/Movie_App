@@ -28,12 +28,22 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.3"
+    }
 }
 
 dependencies {
 
     implementation(project(path = ":module_injector"))
     implementation(libs.coreKtx)
+    implementation(libs.kotlin.reflect)
     implementation(libs.dagger)
     kapt(libs.dagger.compiler)
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.viemodel)
 }

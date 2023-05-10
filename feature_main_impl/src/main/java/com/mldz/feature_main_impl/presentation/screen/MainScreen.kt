@@ -25,29 +25,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.mldz.core_design.R
-import com.mldz.movieapp.models.Movie
+import com.mldz.feature_main_impl.models.Movie
+import com.mldz.feature_main_impl.presentation.MainViewModel
+import com.mldz.feature_main_impl.presentation.PopularMoviesState
 import com.mldz.movieapp.models.MovieMenuItem
 import com.mldz.movieapp.ui.*
 
 
 @Composable
 fun MainScreen(
-    popular: List<Movie>,
-    moviesMenu: List<MovieMenuItem>,
-    upcomnigReleases: List<Movie>,
+    viewModel: MainViewModel,
+    moviesMenu: List<MovieMenuItem>
 ) {
-    Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .systemBarsPadding()
-    ) {
-        TopBar()
-        Popular(popular = popular)
-        Spacer(modifier = Modifier.height(45.dp))
-        MoviesMenu(moviesMenu = moviesMenu)
-        Spacer(modifier = Modifier.size(35.dp))
-        UpComing(upcomingReleases = upcomnigReleases)
-    }
+//    val uiState = viewModel.uiState.collectAsState()
+//    Column(
+//        modifier = Modifier
+//            .verticalScroll(rememberScrollState())
+//            .systemBarsPadding()
+//    ) {
+//        TopBar()
+//        Popular(popularMoviesState = uiState.value.popularMoviesState)
+//        Spacer(modifier = Modifier.height(45.dp))
+//        MoviesMenu(moviesMenu = moviesMenu)
+//        Spacer(modifier = Modifier.size(35.dp))
+////        UpComing(upcomingReleases = upcomnigReleases)
+//    }
 }
 
 @Composable
@@ -122,7 +124,7 @@ fun Search(modifier: Modifier = Modifier) {
 
 @Composable
 fun Popular(
-    popular: List<Movie>,
+    popularMoviesState: PopularMoviesState,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -135,12 +137,18 @@ fun Popular(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 50.dp)
         )
-        LazyRow(
-            modifier = Modifier.padding(top = 15.dp),
-            horizontalArrangement = Arrangement.spacedBy(20.dp),
-            contentPadding = PaddingValues(horizontal = 50.dp)
-        ) {
-            items(popular) { movie -> MoviePopularItem(movie = movie) }
+        when(popularMoviesState) {
+            is PopularMoviesState.Error -> {}
+            is PopularMoviesState.Loading -> {}
+            is PopularMoviesState.Success -> {
+                LazyRow(
+                    modifier = Modifier.padding(top = 15.dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                    contentPadding = PaddingValues(horizontal = 50.dp)
+                ) {
+                    items(popularMoviesState.movies) { movie -> MoviePopularItem(movie = movie) }
+                }
+            }
         }
     }
 }
