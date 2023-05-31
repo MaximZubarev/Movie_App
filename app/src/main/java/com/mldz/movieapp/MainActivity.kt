@@ -26,6 +26,11 @@ import androidx.navigation.compose.rememberNavController
 import com.mldz.core_design.theme.MovieAppTheme
 import com.mldz.feature_main_api.MainFeatureApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.mldz.core_design.theme.BlueAquamarine30
+import com.mldz.core_design.theme.BlueSanJuan
+import com.mldz.core_design.theme.PurpleEastBay
+import com.mldz.core_design.theme.PurpleScampi30
+import com.mldz.core_design.theme.White20
 import com.mldz.movieapp.navigation.register
 import com.mldz.movieapp.ui.*
 import com.mldz.movieapp.utils.NavigationItem

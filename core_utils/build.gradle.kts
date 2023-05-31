@@ -46,4 +46,6 @@ dependencies {
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.compose.ui)
     implementation(libs.compose.viemodel)
+    implementation(libs.compose.animation)
+    implementation(libs.compose.foundation)
 }

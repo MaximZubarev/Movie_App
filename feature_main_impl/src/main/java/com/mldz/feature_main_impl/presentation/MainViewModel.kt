@@ -10,24 +10,39 @@ import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 
-class MainViewModel(
+class MainViewModel @Inject constructor(
     movieRepository: MovieRepository
 ): ViewModel() {
 
     private val popularMovies: Flow<Result<List<Movie>>> = movieRepository.getPopularMovies().asResult()
 
-    val uiState: StateFlow<MainScreenUiState> = popularMovies
+    private val comingSoonMovies: Flow<Result<List<Movie>>> = movieRepository.getComingSoonMovies().asResult()
+
+    val uiState: StateFlow<MainScreenUiState> = combine(
+        popularMovies,
+        comingSoonMovies,
+        ::Pair
+    )
         .map {
-            val popular = when(it) {
-                is Result.Success -> PopularMoviesState.Success(it.data)
-                is Result.Error -> PopularMoviesState.Error
-                is Result.Loading -> PopularMoviesState.Loading
+            val popular = when(it.first) {
+                is Result.Success -> {
+                    MoviesState.Success((it.first as Result.Success<List<Movie>>).data)
+                }
+                is Result.Error -> MoviesState.Error(it.second.toString())
+                is Result.Loading -> MoviesState.Loading
             }
-            MainScreenUiState(popular, PopularMoviesState.Error)
+            val coming = when(it.second) {
+                is Result.Success -> {
+                    MoviesState.Success((it.second as Result.Success<List<Movie>>).data)
+                }
+                is Result.Error -> MoviesState.Error(it.second.toString())
+                is Result.Loading -> MoviesState.Loading
+            }
+            MainScreenUiState(popular, coming)
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = MainScreenUiState(PopularMoviesState.Loading, PopularMoviesState.Loading)
+            initialValue = MainScreenUiState(MoviesState.Loading, MoviesState.Loading)
         )
 }

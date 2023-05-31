@@ -8,15 +8,14 @@ import dagger.Component
 
 @Component(
     modules = [
-        MainFeatureModule::class,
-        ViewModelModule::class
+        MainFeatureModule::class
     ],
     dependencies = [MainFeatureDependencies::class]
 )
 @PerFeature
-abstract class MainFeatureComponent : MainFeatureApi {
+interface MainFeatureComponent : MainFeatureApi {
 
-    abstract fun getMainViewModel(): MainViewModel
+    fun getViewModel(): MainViewModel
 
     companion object {
         fun initAndGet(dependencies: MainFeatureDependencies): MainFeatureComponent {

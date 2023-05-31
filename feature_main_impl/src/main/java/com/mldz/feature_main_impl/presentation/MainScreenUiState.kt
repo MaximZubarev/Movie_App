@@ -4,12 +4,12 @@ import com.mldz.feature_main_impl.models.Movie
 
 
 data class MainScreenUiState(
-    val popularMoviesState: PopularMoviesState,
-    val comingSoonMoviesState: PopularMoviesState
+    val popularMoviesState: MoviesState,
+    val comingSoonMoviesState: MoviesState
 )
 
-sealed interface PopularMoviesState {
-    class Success(val movies: List<Movie>): PopularMoviesState
-    object Error: PopularMoviesState
-    object Loading: PopularMoviesState
+sealed interface MoviesState {
+    class Success(val movies: List<Movie>): MoviesState
+    class Error(val message: String): MoviesState
+    object Loading: MoviesState
 }

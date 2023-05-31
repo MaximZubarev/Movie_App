@@ -24,6 +24,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.mldz.core_design.theme.BlackCodGray
+import com.mldz.core_design.theme.BlackCodGray00
+import com.mldz.core_design.theme.BlueAnakiwa30
+import com.mldz.core_design.theme.PurpleCold30
+import com.mldz.core_design.theme.White05
+import com.mldz.core_design.theme.White20
 import com.mldz.movieapp.R
 import com.mldz.feature_main_impl.models.Movie
 import com.mldz.movieapp.models.MovieMenuItem

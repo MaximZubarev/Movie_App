@@ -17,7 +17,7 @@ abstract class CoreNetworkComponent: CoreNetworkApi {
             if (component == null) {
                 synchronized(CoreNetworkComponent::class.java) {
                     if (component == null) {
-//                        component = DaggerCoreNetworkComponent.builder().build()
+                        component = DaggerCoreNetworkComponent.builder().build()
                     }
                 }
             }

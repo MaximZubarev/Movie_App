@@ -1,4 +1,4 @@
-package com.mldz.movieapp.ui
+package com.mldz.core_design.theme
 
 import androidx.compose.ui.graphics.Color
 

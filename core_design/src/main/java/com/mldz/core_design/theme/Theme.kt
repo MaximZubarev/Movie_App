@@ -5,8 +5,6 @@ import androidx.compose.material.Typography
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.mldz.movieapp.ui.BlackCinder
-import com.mldz.movieapp.ui.Shapes
 
 
 @Composable

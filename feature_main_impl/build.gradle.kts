@@ -34,4 +34,7 @@ dependencies {
     implementation(libs.navigation)
     implementation(libs.bundles.compose)
     implementation(libs.coil)
+    implementation(libs.compose.viemodel)
+    implementation(libs.compose.tooling.preview)
+    debugImplementation(libs.compose.tooling)
 }
