@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Movie App</string>
+    <string name="app_name">MovieSpotter</string>
     <string name="title_activity_movie_details">MovieDetailsActivity</string>
 
     <string name="menu_main">Main</string>
