@@ -14,10 +14,16 @@ class MovieRepositoryImpl @Inject constructor(
     private val httpClient: HttpClient
 ): MovieRepository {
 
-    override fun getPopularMovies(): Flow<List<Movie>> {
+    override fun getNowInTheatreMovies(): Flow<List<Movie>> {
         return flow {
-            emit(httpClient.getPopularMovies().mostPopularDataDetails.take(5).map {
-                Movie(it.id, it.image, it.title)
+            emit(httpClient.getNowInTheatreMovies().items.take(5).map {
+                Movie(
+                    id = it.id,
+                    imagePath = it.image,
+                    title = it.title,
+                    year = it.releaseState,
+                    rating = it.imDbRating
+                )
             })
         }
     }
@@ -25,7 +31,39 @@ class MovieRepositoryImpl @Inject constructor(
     override fun getComingSoonMovies(): Flow<List<Movie>> {
         return flow {
             emit(httpClient.getComingSoonMovies().items.take(5).map {
-                Movie(it.id, it.image, it.title)
+                Movie(
+                    id = it.id,
+                    imagePath = it.image,
+                    title = it.title,
+                    year = it.releaseState,
+                )
+            })
+        }
+    }
+
+    override fun getPopularMovies(): Flow<List<Movie>> {
+        return flow {
+            emit(httpClient.getPopularMovies().mostPopularDataDetails.take(5).map {
+                Movie(
+                    id = it.id,
+                    imagePath = it.image,
+                    title = it.title,
+                    year = it.year,
+                    rating = it.imDbRating
+                )
+            })
+        }
+    }
+
+    override fun getTop250Movies(): Flow<List<Movie>> {
+        return flow {
+            emit(httpClient.getTopMovies().items.take(5).map {
+                Movie(
+                    id = it.id,
+                    imagePath = it.image,
+                    title = it.title,
+                    rating = it.imDbRating
+                )
             })
         }
     }

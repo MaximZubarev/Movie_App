@@ -25,3 +25,5 @@ val BlueAquamarine30 = Color(0x4D75D1DD)
 val PurpleEastBay = Color(0xff4E4376)
 val PurpleCold30 = Color(0x4DA6A1E0)
 val PurpleScampi30 = Color(0x4D6B66A6)
+
+val YellowRipeLemon = Color(0xFFF5C819)

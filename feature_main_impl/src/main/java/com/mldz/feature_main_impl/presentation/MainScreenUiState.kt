@@ -4,8 +4,23 @@ import com.mldz.feature_main_impl.models.Movie
 
 
 data class MainScreenUiState(
+    val type: Type
+)
+
+sealed interface Type {
+    class MovieType(val movies: MovieData): Type
+    class TheatreType(val theatre: TheatreData): Type
+}
+
+data class MovieData(
+    val inTheatreMoviesState: MoviesState,
+    val comingSoonMoviesState: MoviesState,
     val popularMoviesState: MoviesState,
-    val comingSoonMoviesState: MoviesState
+    val top250MoviesState: MoviesState,
+)
+
+data class TheatreData(
+    val data: Any
 )
 
 sealed interface MoviesState {

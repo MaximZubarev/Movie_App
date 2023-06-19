@@ -10,8 +10,15 @@
     <string name="search">Search</string>
     <string name="most_popular">Most popular</string>
     <string name="upcoming_releases">Upcoming releases</string>
+    <string name="in_theatres">Now in theatres</string>
+    <string name="box_office">Box office all time</string>
+    <string name="top250">Top 250</string>
     <string name="movie_menu_genres">Genres</string>
     <string name="movie_menu_tv_series">Tv series</string>
     <string name="movie_menu_movies">Movies</string>
     <string name="movie_menu_in_theatre">In Theatre</string>
+    <string name="type_movies">Movies</string>
+    <string name="type_series">Tv series</string>
+    <string name="see_all">See all</string>
+    <string name="imdb">IMDB</string>
 </resources>

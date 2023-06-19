@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mldz.core_design.R
@@ -34,21 +35,15 @@ fun TopBar() {
     Column(
         modifier = Modifier.padding(
             start = paddingHorizontal,
-            top = 50.dp,
-            end = paddingHorizontal
+            end = paddingHorizontal,
         )
     ) {
-        Row(
-            modifier = Modifier.padding(
-                start = 14.dp,
-                end = 14.dp
-            )
-        ) {
+        Row {
             Greeting(
                 modifier = Modifier.weight(1f)
             )
             Image(
-                painter = painterResource(id = R.drawable.ic_notfication),
+                painter = painterResource(id = R.drawable.ic_search),
                 contentDescription = "",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
@@ -56,8 +51,14 @@ fun TopBar() {
                     .height(24.dp)
             )
         }
-        Search(modifier = Modifier.padding(top = 21.dp))
+//        Search(modifier = Modifier.padding(top = 21.dp))
     }
+}
+
+@Preview
+@Composable
+fun TopBarPreview() {
+    TopBar()
 }
 
 @Composable

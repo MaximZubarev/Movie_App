@@ -25,4 +25,5 @@ dependencies {
     implementation(libs.compose.material)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation(libs.coreKtx)
 }

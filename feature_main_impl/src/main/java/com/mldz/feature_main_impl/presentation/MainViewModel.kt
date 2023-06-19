@@ -14,35 +14,59 @@ class MainViewModel @Inject constructor(
     movieRepository: MovieRepository
 ): ViewModel() {
 
-    private val popularMovies: Flow<Result<List<Movie>>> = movieRepository.getPopularMovies().asResult()
+    private val inTheatreMovies: Flow<Result<List<Movie>>> = movieRepository.getNowInTheatreMovies().asResult()
 
     private val comingSoonMovies: Flow<Result<List<Movie>>> = movieRepository.getComingSoonMovies().asResult()
 
+    private val popularMovies: Flow<Result<List<Movie>>> = movieRepository.getPopularMovies().asResult()
+
+    private val top250Movies: Flow<Result<List<Movie>>> = movieRepository.getTop250Movies().asResult()
+
     val uiState: StateFlow<MainScreenUiState> = combine(
-        popularMovies,
+        inTheatreMovies,
         comingSoonMovies,
-        ::Pair
-    )
+        popularMovies,
+        top250Movies,
+    ) { theatre, coming, popular, top ->
+        val pair1 = Pair(theatre, coming)
+        val pair2 = Pair(popular, top)
+        Pair(pair1, pair2)
+    }
         .map {
-            val popular = when(it.first) {
-                is Result.Success -> {
-                    MoviesState.Success((it.first as Result.Success<List<Movie>>).data)
-                }
-                is Result.Error -> MoviesState.Error(it.second.toString())
-                is Result.Loading -> MoviesState.Loading
-            }
-            val coming = when(it.second) {
-                is Result.Success -> {
-                    MoviesState.Success((it.second as Result.Success<List<Movie>>).data)
-                }
-                is Result.Error -> MoviesState.Error(it.second.toString())
-                is Result.Loading -> MoviesState.Loading
-            }
-            MainScreenUiState(popular, coming)
+            getMainScreenState(it)
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = MainScreenUiState(MoviesState.Loading, MoviesState.Loading)
+            initialValue = MainScreenUiState(
+                type = Type.MovieType(
+                    movies = MovieData(MoviesState.Loading, MoviesState.Loading, MoviesState.Loading, MoviesState.Loading)
+                )
+            )
         )
+
+    private fun getMainScreenState(
+        movies: Pair<Pair<Result<List<Movie>>, Result<List<Movie>>>,
+            Pair<Result<List<Movie>>, Result<List<Movie>>>>
+    ): MainScreenUiState {
+        val theatre = getState(movies.first.first)
+        val coming = getState(movies.first.second)
+        val popular = getState(movies.second.first)
+        val top = getState(movies.second.second)
+        return MainScreenUiState(
+            type = Type.MovieType(
+                movies = MovieData(theatre, coming, popular, top)
+            )
+        )
+    }
+
+    private fun getState(movie: Result<List<Movie>>): MoviesState {
+        return when(movie) {
+            is Result.Success -> {
+                MoviesState.Success(movie.data)
+            }
+            is Result.Error -> MoviesState.Error(movie.toString())
+            is Result.Loading -> MoviesState.Loading
+        }
+    }
 }
